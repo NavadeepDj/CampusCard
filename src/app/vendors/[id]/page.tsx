@@ -7,11 +7,12 @@ import { vendors } from '@/lib/data';
 import { ArrowLeft, CheckCircle, Plus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useMemo } from 'react';
 
-export default function VendorPage({ params }: { params: { id: string } }) {
+export default function VendorPage() {
+  const params = useParams<{ id: string }>();
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
   const vendor = vendors.find(v => v.id === params.id);
   const { dispatch, state } = useCart();
