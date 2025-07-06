@@ -15,53 +15,63 @@ export default function CameraScan() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // This effect runs once on mount to initialize the scanner
     const codeReader = new BrowserMultiFormatReader();
-
-    const startScanning = async () => {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Not Supported',
-          description: 'Your browser does not support camera access.',
-        });
+    
+    const startScan = async () => {
+      // Ensure the video element is mounted
+      if (!videoRef.current) {
         return;
       }
-      
+
+      // Reset scan status for re-scans if the dialog is reopened
+      isScannedRef.current = false;
+      setScanResult(null);
+
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setHasCameraPermission(true);
+        // The static method listVideoInputDevices prompts for permission
+        const videoInputDevices = await BrowserMultiFormatReader.listVideoInputDevices();
 
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
+        if (videoInputDevices.length > 0) {
+          setHasCameraPermission(true);
+          const firstDeviceId = videoInputDevices[0].deviceId;
 
-        const videoInputDevices = await codeReader.listVideoInputDevices();
-        if (videoInputDevices.length > 0 && videoRef.current) {
-          const deviceId = videoInputDevices[0].deviceId;
-          
-          controlsRef.current = codeReader.decodeFromVideoDevice(deviceId, videoRef.current, (result, err) => {
+          // decodeFromVideoDevice will start the camera stream and continuously scan
+          controlsRef.current = codeReader.decodeFromVideoDevice(firstDeviceId, videoRef.current, (result, err) => {
             if (result && !isScannedRef.current) {
+              // Once a result is found, we stop scanning
               isScannedRef.current = true;
-              const scannedText = result.getText();
-              setScanResult(scannedText);
+              setScanResult(result.getText());
               toast({
                 title: 'Scan Successful!',
                 description: `ID Scanned.`,
               });
+              // Stop the scanner and release the camera
               controlsRef.current?.stop();
             }
 
+            // We want to ignore NotFoundException because it's thrown when no code is found in a frame
             if (err && !(err instanceof NotFoundException)) {
               console.error('Barcode scan error:', err);
+              toast({
+                variant: 'destructive',
+                title: 'Scan Error',
+                description: 'An error occurred while scanning.',
+              });
             }
           });
         } else {
+          // No camera found
           setHasCameraPermission(false);
-          toast({ variant: 'destructive', title: 'No Camera Found' });
+          toast({
+            variant: 'destructive',
+            title: 'No Camera Found',
+            description: 'Could not find a camera on this device.',
+          });
         }
       } catch (error) {
-        console.error('Error accessing camera:', error);
+        // This block catches permission denied errors
+        console.error('Error initializing camera:', error);
         setHasCameraPermission(false);
         toast({
           variant: 'destructive',
@@ -71,15 +81,11 @@ export default function CameraScan() {
       }
     };
 
-    startScanning();
-    
+    startScan();
+
+    // The cleanup function is critical to release the camera when the component unmounts
     return () => {
       controlsRef.current?.stop();
-      if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-        videoRef.current.srcObject = null;
-      }
     };
   }, [toast]);
 
@@ -88,7 +94,7 @@ export default function CameraScan() {
       <div className="relative w-full aspect-video rounded-md overflow-hidden border bg-muted">
         <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
         
-        {hasCameraPermission === null && (
+        {hasCameraPermission === null && !scanResult && (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground bg-background">
             <QrCode className="h-16 w-16 mb-4 animate-pulse" />
             <p className="text-sm">Requesting camera access...</p>
