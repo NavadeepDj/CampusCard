@@ -1,4 +1,4 @@
-import { ShoppingBag, User, History, LogIn } from 'lucide-react';
+import { ShoppingBag, User, History } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import CartIcon from './cart-icon';
@@ -24,6 +24,9 @@ export default function Header() {
               </Link>
             </Button>
             <CartIcon />
+            <Button asChild>
+              <Link href="/login">Login</Link>
+            </Button>
           </nav>
         </div>
       </div>
