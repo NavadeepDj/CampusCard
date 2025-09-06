@@ -29,6 +29,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    // This effect handles redirecting the user after login.
+    // If the page is not loading, we have a user, and they are on the login page,
+    // we redirect them to the home page.
     if (!loading && user && pathname === '/login') {
       router.push('/');
     }

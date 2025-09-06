@@ -22,15 +22,15 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     try {
+        // This will start the redirect flow. The user will be sent away and then
+        // back to the app. The AuthProvider will handle the redirect result.
         await signInWithGoogle();
-        // The redirect flow is handled by the AuthProvider now.
-        // It will redirect the user to the home page on successful login.
     } catch (error) {
         console.error("Sign-in failed", error);
         toast({
             variant: 'destructive',
             title: 'Sign In Failed',
-            description: 'Could not sign in with Google. Please try again.',
+            description: 'Could not initiate sign-in with Google. Please try again.',
         });
     }
   };
