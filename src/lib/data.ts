@@ -16,7 +16,7 @@ export const vendors: Vendor[] = [
   },
   {
     id: '2',
-    name: 'The Study Snack',
+    name: 'Lee Corner',
     description: 'Quick bites, energy drinks, and healthy snacks to fuel your study sessions.',
     image: 'https://placehold.co/600x400.png',
     dataAiHint: 'snack aisle',
