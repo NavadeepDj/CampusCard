@@ -63,7 +63,7 @@ export default function CameraScan() {
           if (result) {
             playBeep();
             setScanResult(result.getText());
-            stopScan();
+            stopScan(); // This is the crucial fix
           }
 
           if (err && !(err instanceof NotFoundException)) {
@@ -169,8 +169,14 @@ export default function CameraScan() {
           </AlertDescription>
         </Alert>
       ) : (
-        <Button onClick={startScan} disabled={isScanning} className="w-full">
-            {scanResult ? <><QrCode className="mr-2 h-4 w-4" />Scan Again</> : 'Start Scanning'}
+        <Button onClick={scanResult ? startScan : isScanning ? stopScan : startScan} disabled={!hasCameraPermission} className="w-full">
+          {scanResult ? (
+            <><QrCode className="mr-2 h-4 w-4" />Scan Again</>
+          ) : isScanning ? (
+            'Stop Scanning'
+          ) : (
+            <><QrCode className="mr-2 h-4 w-4" />Start Scanning</>
+          )}
         </Button>
       )}
     </div>
