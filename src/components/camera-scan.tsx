@@ -8,9 +8,8 @@ import { CheckCircle, QrCode, CameraOff } from 'lucide-react';
 import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
 import { Button } from './ui/button';
 
-export default function CameraScan() {
+export default function CameraScan({ onScanSuccess }: { onScanSuccess?: (result: string) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  // Use a ref to hold the code reader instance to avoid re-creation
   const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
   
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -27,7 +26,7 @@ export default function CameraScan() {
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
       
-      gainNode.gain.value = 0.1; // Keep volume low
+      gainNode.gain.value = 0.1;
       oscillator.frequency.value = 523.25; // C5 note
       oscillator.type = 'sine';
       
@@ -35,7 +34,7 @@ export default function CameraScan() {
       setTimeout(() => {
         oscillator.stop();
         audioContext.close();
-      }, 150); // Beep duration
+      }, 150);
     } catch (e) {
       console.error("Failed to play beep sound.", e);
     }
@@ -55,20 +54,22 @@ export default function CameraScan() {
     setIsScanning(true);
 
     try {
-      // The decodeFromVideoDevice will stream from the camera and decode continuously
       await codeReaderRef.current.decodeFromVideoDevice(
-        undefined, // Use undefined to let ZXing pick the default camera
+        undefined,
         videoRef.current,
         (result, err) => {
           if (result) {
             playBeep();
-            setScanResult(result.getText());
-            stopScan(); // This is the crucial fix
+            const resultText = result.getText();
+            setScanResult(resultText);
+            stopScan();
+            if (onScanSuccess) {
+              onScanSuccess(resultText);
+            }
           }
 
           if (err && !(err instanceof NotFoundException)) {
             console.error('Barcode scan error:', err);
-            // Optionally stop scanning on other errors too
             stopScan();
           }
         }
@@ -76,20 +77,17 @@ export default function CameraScan() {
 
     } catch (error) {
       console.error('Error initializing camera for scanning:', error);
-      setHasCameraPermission(false); // Assume permission issue or no camera
+      setHasCameraPermission(false);
       setIsScanning(false);
     }
-  }, [stopScan]);
+  }, [stopScan, onScanSuccess]);
 
 
-  // Effect for initializing and cleaning up the scanner
   useEffect(() => {
     codeReaderRef.current = new BrowserMultiFormatReader();
     
-    // Request permission and start stream
     const getCameraPermission = async () => {
       try {
-        // We only ask for permission here, not for starting the scan
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         setHasCameraPermission(true);
         if (videoRef.current) {
@@ -103,7 +101,6 @@ export default function CameraScan() {
     
     getCameraPermission();
 
-    // Cleanup
     return () => {
       if (codeReaderRef.current) {
         codeReaderRef.current.reset();

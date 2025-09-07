@@ -1,3 +1,6 @@
+
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -6,8 +9,29 @@ import { Camera, Store, Utensils } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import CameraScan from '@/components/camera-scan';
+import { useCart } from '@/contexts/cart-provider';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Home() {
+  const { dispatch } = useCart();
+  const { toast } = useToast();
+  const router = useRouter();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleScanSuccess = (scanResult: string) => {
+    // In a real app, you would likely validate the scanResult with a backend
+    // and associate the payment with the student ID.
+    dispatch({ type: 'CLEAR_CART' });
+    toast({
+      title: 'Payment Successful!',
+      description: `Payment authorized for Student ID: ${scanResult}.`,
+    });
+    setIsDialogOpen(false);
+    router.push('/history');
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <section className="text-center py-16">
@@ -22,7 +46,7 @@ export default function Home() {
             Your one-stop solution for seamless payments at any vendor across campus. Tap, pay, and go!
           </p>
         </div>
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="lg" className="mt-8 bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8 py-6 rounded-full shadow-lg transition-transform transform hover:scale-105">
               <Camera className="mr-3 h-6 w-6" />
@@ -36,7 +60,7 @@ export default function Home() {
                 Position your student ID card in front of the camera.
               </DialogDescription>
             </DialogHeader>
-            <CameraScan />
+            <CameraScan onScanSuccess={handleScanSuccess} />
           </DialogContent>
         </Dialog>
       </section>
