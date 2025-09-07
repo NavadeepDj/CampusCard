@@ -40,6 +40,19 @@ export const vendors: Vendor[] = [
       { id: '304', name: 'Chai Tea', price: 2.50, stock: 45, image: 'https://placehold.co/400x300.png', dataAiHint: 'chai tea' },
     ],
   },
+  {
+    id: '4',
+    name: 'Fruit Shop',
+    description: 'Fresh and juicy fruits, smoothies, and healthy juices.',
+    image: 'https://placehold.co/600x400.png',
+    dataAiHint: 'fruit stand',
+    products: [
+      { id: '401', name: 'Banana', price: 0.50, stock: 150, image: 'https://placehold.co/400x300.png', dataAiHint: 'banana fruit' },
+      { id: '402', name: 'Orange Juice', price: 3.50, stock: 50, image: 'https://placehold.co/400x300.png', dataAiHint: 'orange juice' },
+      { id: '403', name: 'Fruit Salad', price: 5.00, stock: 30, image: 'https://placehold.co/400x300.png', dataAiHint: 'fruit salad' },
+      { id: '404', name: 'Berry Smoothie', price: 6.00, stock: 25, image: 'https://placehold.co/400x300.png', dataAiHint: 'berry smoothie' },
+    ],
+  },
 ];
 
 export const transactions: Transaction[] = [
@@ -65,7 +78,7 @@ export const transactions: Transaction[] = [
   },
   {
     id: 't3',
-    vendorName: 'The Study Snack',
+    vendorName: 'Lee Corner',
     date: '2024-05-15',
     items: [
       { name: 'Energy Drink', quantity: 2, price: 3.50 },
