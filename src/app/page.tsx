@@ -42,7 +42,7 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-foreground">
             Welcome to Campus Cart
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-4 text-lg text-foreground/90">
             Your one-stop solution for seamless payments at any vendor across campus. Tap, pay, and go!
           </p>
         </div>
