@@ -49,11 +49,9 @@ export default function VendorPage() {
             Back to Vendors
           </Link>
         </Button>
-        <div className="flex flex-col md:flex-row items-start gap-8">
-          <div className="md:w-2/3">
+        <div>
             <h1 className="text-4xl font-bold font-headline">{vendor.name}</h1>
             <p className="mt-2 text-lg text-muted-foreground">{vendor.description}</p>
-          </div>
         </div>
       </div>
 
