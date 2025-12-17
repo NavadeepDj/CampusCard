@@ -1,8 +1,6 @@
-
 'use client';
 
 import { getStudentProfile } from '@/ai/flows/student-profile-flow';
-import CameraScan from '@/components/camera-scan';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -17,10 +15,11 @@ import { useCart } from '@/contexts/cart-provider';
 import { useToast } from '@/hooks/use-toast';
 import { vendors } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import { Camera, Loader2, Store, Utensils } from 'lucide-react';
+import { Loader2, Store, Utensils, Nfc } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import NfcScan from '@/components/nfc-scan';
 
 export default function Home() {
   const { dispatch, state } = useCart();
@@ -91,15 +90,15 @@ export default function Home() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="lg" className="mt-8 bg-foreground text-background hover:bg-foreground/90 text-lg px-8 py-6 rounded-full shadow-lg transition-transform transform hover:scale-105">
-              <Camera className="mr-3 h-6 w-6" />
-              Scan Student ID to Pay
+              <Nfc className="mr-3 h-6 w-6" />
+              Tap Student ID to Pay
             </Button>
           </DialogTrigger>
           <DialogContent className="glass-card">
             <DialogHeader>
-              <DialogTitle>Scan ID to Pay</DialogTitle>
+              <DialogTitle>Tap ID to Pay</DialogTitle>
               <DialogDescription>
-                Position your student ID card in front of the camera. Your cart total will be charged.
+                Hold your student ID card near the back of your device. Your cart total will be charged.
               </DialogDescription>
             </DialogHeader>
             {isProcessing ? (
@@ -108,7 +107,7 @@ export default function Home() {
                   <p className="text-muted-foreground">Verifying Student ID...</p>
                </div>
             ) : (
-              <CameraScan onScanSuccess={handleScanSuccess} />
+              <NfcScan onScanSuccess={handleScanSuccess} />
             )}
           </DialogContent>
         </Dialog>
